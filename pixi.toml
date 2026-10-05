@@ -9,12 +9,20 @@ version = "0.1.0"
 build = "bash build/build.sh"
 test = "python -m pytest tests -q"
 bench = "flock /tmp/mojo-bench.lock python bench/bench.py"
+# every @exported kernel must be named in tests/, by the same check the test
+# suite runs, available on its own so it can be used as a pre-commit gate
+check-kernels = "bash -c 'for s in $(grep -hoE \"@export\\(\\\"[A-Za-z_0-9]+\\\"\\)\" src/*.mojo | sed \"s/@export(\\\"//;s/\\\")//\"); do grep -rqF \"$s\" tests/ || { echo \"UNTESTED KERNEL: $s\"; found=1; }; done; exit ${found:-0}'"
 
 [activation.env]
 PYTHONPATH = "python"
 
 [dependencies]
-mojo = "==1.2.0.dev2026092605"
+mojo = "==1.2.0.dev2026092905"
+max = "==26.7.0.dev2026092905"
 python = "3.13.*"
 pytest = "*"
 numpy = "*"
+scipy = "*"
+matplotlib = "*"
+# upstream, for parity testing only
+pyroomacoustics = "*"
